@@ -12,13 +12,13 @@ namespace custom_libraries {
 USART::USART(USART_TypeDef *_USART,
 				GPIO_TypeDef *GPIO,
 				_DMA ACTUAL_DMA,
-				DMA_Stream_TypeDef *DMA_STREAM,
+				DMA_Channel_TypeDef *DMA_CHANNEL,
 				uint8_t RX_PIN,
 				uint8_t TX_PIN,
 				int baudrate):_USART(_USART),
 								GPIO(GPIO),
 								ACTUAL_DMA(ACTUAL_DMA),
-								DMA_STREAM(DMA_STREAM),
+								DMA_CHANNEL(DMA_CHANNEL),
 								RX_PIN(RX_PIN),
 								TX_PIN(TX_PIN),
 								baudrate(baudrate){
@@ -125,36 +125,83 @@ void USART::config_DMA(){
 	_USART->CR3 |= USART_CR3_DMAR;
 
 	//Enable DMA RCC
-	if(ACTUAL_DMA == _DMA1) RCC->AHB1ENR |= RCC_AHB1ENR_DMA1EN;
-	if(ACTUAL_DMA == _DMA2) RCC->AHB1ENR |= RCC_AHB1ENR_DMA2EN;
+	if(ACTUAL_DMA == _DMA1) RCC->AHBENR |= RCC_AHBENR_DMA1EN;
+	if(ACTUAL_DMA == _DMA2) RCC->AHBENR |= (1<<1);
 
-	//Select DMA_stream
-	if(_USART == USART1)  DMA_STREAM->CR |= (1<<27);//channel 4,DMA2,Stream5
-	if(_USART == USART2)  DMA_STREAM->CR |= (1<<27) ;//channel 4,DMA1,Stream5
-	if(_USART == USART3)  DMA_STREAM->CR |= (1<<27) ;//channel 4,DMA1,stream1
+	if(_USART == USART1){
+		//set Memory data size to 8bits
+		DMA_CHANNEL->CCR &= ~DMA_CCR5_MSIZE;
+		//Set peripheral data size to 8bits
+		DMA_CHANNEL->CCR &= ~DMA_CCR5_PSIZE;
+		//set memory increment mode
+		DMA_CHANNEL->CCR |= DMA_CCR5_MINC;
+		//Enable DMA circular mode
+		DMA_CHANNEL->CCR |= DMA_CCR5_CIRC;
+		//Number of data Items to be transfered
+		DMA_CHANNEL->CNDTR = BUFFER_SIZE;
+		//Give peripheral address
+		DMA_CHANNEL->CPAR = (uint32_t)(&_USART->DR);
+		//Give memory address
+		DMA_CHANNEL->CMAR = (uint32_t)receive_buffer;
+		//Enable the DMA
+		DMA_CHANNEL->CCR |= DMA_CCR5_EN;
+	}
 
-	//set Memory data size to 8bits
-	DMA_STREAM->CR &= ~DMA_SxCR_MSIZE;
-	//Set peripheral data size to 8bits
-	DMA_STREAM->CR &= ~DMA_SxCR_PSIZE;
-	//set memory increment mode
-	DMA_STREAM->CR |= DMA_SxCR_MINC;
-	//Enable DMA circular mode
-	DMA_STREAM->CR |= DMA_SxCR_CIRC;
-	//Number of data Items to be transfered
-	DMA_STREAM->NDTR = BUFFER_SIZE;
-	//Give peripheral address
-	DMA_STREAM->PAR = (uint32_t)(&_USART->DR);
-	//Give memory address
-	DMA_STREAM->M0AR = (uint32_t)receive_buffer;
-	//Enable the DMA
-	DMA_STREAM->CR |= DMA_SxCR_EN;
+	if(_USART == USART2){
+		//set Memory data size to 8bits
+		DMA_CHANNEL->CCR &= ~DMA_CCR6_MSIZE;
+		//Set peripheral data size to 8bits
+		DMA_CHANNEL->CCR &= ~DMA_CCR6_PSIZE;
+		//set memory increment mode
+		DMA_CHANNEL->CCR |= DMA_CCR6_MINC;
+		//Enable DMA circular mode
+		DMA_CHANNEL->CCR |= DMA_CCR6_CIRC;
+		//Number of data Items to be transfered
+		DMA_CHANNEL->CNDTR = BUFFER_SIZE;
+		//Give peripheral address
+		DMA_CHANNEL->CPAR = (uint32_t)(&_USART->DR);
+		//Give memory address
+		DMA_CHANNEL->CMAR = (uint32_t)receive_buffer;
+		//Enable the DMA
+		DMA_CHANNEL->CCR |= DMA_CCR6_EN;
+	}
+
+	if(_USART == USART3){
+		//set Memory data size to 8bits
+		DMA_CHANNEL->CCR &= ~DMA_CCR3_MSIZE;
+		//Set peripheral data size to 8bits
+		DMA_CHANNEL->CCR &= ~DMA_CCR3_PSIZE;
+		//set memory increment mode
+		DMA_CHANNEL->CCR |= DMA_CCR3_MINC;
+		//Enable DMA circular mode
+		DMA_CHANNEL->CCR |= DMA_CCR3_CIRC;
+		//Number of data Items to be transfered
+		DMA_CHANNEL->CNDTR = BUFFER_SIZE;
+		//Give peripheral address
+		DMA_CHANNEL->CPAR = (uint32_t)(&_USART->DR);
+		//Give memory address
+		DMA_CHANNEL->CMAR = (uint32_t)receive_buffer;
+		//Enable the DMA
+		DMA_CHANNEL->CCR |= DMA_CCR3_EN;
+	}
+	
+
 
 }
 
 void USART::reset_DMA(){
-	DMA_STREAM->CR &= ~DMA_SxCR_EN;
-	DMA_STREAM->CR |= DMA_SxCR_EN;
+	if(_USART == USART1){
+		DMA_CHANNEL->CCR &= ~DMA_CCR5_EN;
+		DMA_CHANNEL->CCR |= DMA_CCR5_EN;
+	}
+	if(_USART == USART2){
+		DMA_CHANNEL->CCR &= ~DMA_CCR6_EN;
+		DMA_CHANNEL->CCR |= DMA_CCR6_EN;
+	}
+	if(_USART == USART3){
+		DMA_CHANNEL->CCR &= ~DMA_CCR3_EN;
+		DMA_CHANNEL->CCR |= DMA_CCR3_EN;
+	}	
 
 }
 

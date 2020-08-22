@@ -28,7 +28,7 @@ private:
 	USART_TypeDef *_USART;
 	GPIO_TypeDef *GPIO;
 	_DMA ACTUAL_DMA;
-	DMA_Stream_TypeDef *DMA_STREAM;
+	DMA_Channel_TypeDef *DMA_CHANNEL;
 	uint8_t RX_PIN;
 	uint8_t TX_PIN;
 	int baudrate;
@@ -44,7 +44,7 @@ public:
 	USART(USART_TypeDef *_USART,
 			GPIO_TypeDef *GPIO,
 			_DMA ACTUAL_DMA,
-			DMA_Stream_TypeDef *DMA_STREAM,
+			DMA_Channel_TypeDef *DMA_CHANNEL,
 			uint8_t RX_PIN,
 			uint8_t TX_PIN,
 			int baudrate);
@@ -60,3 +60,4 @@ public:
 } /* namespace custom_libraries */
 
 #endif /* USART_H_ */
+ 

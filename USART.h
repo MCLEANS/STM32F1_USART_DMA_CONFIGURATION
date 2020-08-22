@@ -10,9 +10,10 @@
 #ifndef USART_H_
 #define USART_H_
 
-#include "stm32f4xx.h"
-#define CLOCK_FREQ_APB1 42000000UL
-#define CLOCK_FREQ_APB2 84000000UL
+#include "stm32f10x.h"
+
+#define CLOCK_FREQ_APB1 36000000UL
+#define CLOCK_FREQ_APB2 72000000UL
 #define BUFFER_SIZE 1024
 
 namespace custom_libraries {

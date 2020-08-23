@@ -30,7 +30,6 @@ int main(void) {
   GPIOC->CRH &= ~GPIO_CRH_CNF13;
     
   while(1){
-
     if(ok_received){
       for(volatile int i = 0; i<9000000; i++){}
       GPIOC->ODR ^= GPIO_ODR_ODR13;
